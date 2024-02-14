@@ -1,26 +1,31 @@
-# Machine Learning para localizar-Emisión Acústica EA en Rocas
 
-Mi tema de tesis de doctorado esta enmarcado en el estudio de las ondas de Emision Acustica como precursores de grandes sismos, asi que decidi enfocar este trabajo práctico en buscar alguna aplicación a mi tema. Las emisiones acústicas (EA) son las ondas de tensión producidas por la repentina redistribución de la tensión interna de los materiales causada por los cambios en la estructura interna. Los cambios en la estructura interna pueden ser la iniciación de grietas dentro de la roca, apertura de grietas, fracturamiento, etc. La mayoría de las fuentes de EA están relacionadas con los daños; por lo tanto, la correcta localizacion de estas emisiones se utilizan habitualmente para predecir el fallo de los materiales. 
+# Machine Learning for Acoustic Emission (AE) Localization in Rock
+
+My doctoral thesis is framed within the study of Acoustic Emission waves as precursors to major earthquakes. Consequently, I have chosen to focus this practical work on exploring potential applications for my research. Acoustic Emissions (AE) are stress waves produced by the sudden redistribution of internal stress in materials caused by changes in internal structure. These changes in internal structure can include the initiation of cracks within rocks, crack opening, fracturing, etc. Most sources of AE are associated with damage; therefore, accurately locating these emissions is commonly used to predict material failure
 
 ![image](https://github.com/AlejandraRocks/-Machine-Learning-para-localizar-Emisi-n-Ac-stica-EA-en-Rocas-/assets/69768600/0dc72c51-48af-4cb4-85ee-7edcc8a97122)
 
-Para localizar las fuentes de EA usualmente se utilizan metodos similares al campo de la sismologia, y los más utilizados son los métodos de inversión del tiempo de recorrido de la onda (Geiger 1912; Aki y Lee 1976). Estos métodos se centran en torno al objetivo de resolver la relación no lineal entre el tiempo de viaje y la localización del hipocentro, lo que requiere modelos de velocidad constante predefinidos del medio (Richards et al.
-2006). Para el caso caso que me interesa (localizacion de EA en rocas) la tarea se convierte en algo muy dificil cuando la roca tiene anisotropia. Esto requiere inversion tomografica de la muestra para establecer un modelo de velocidad y luego una inversion iterativa para localizar, lo cual es computacionalmente caro. En este trabajo práctico usaré algunos métodos de  Machine Learning para localizar la coordenada x,y usando solo los tiempos de arribo de la onda P, para eludir por completo la complejidad de establecer un modelo de velocidades y el proceso interativo de inversión. 
+To locate the sources of Acoustic Emission (AE), methods similar to those in seismology are commonly employed, with the most utilized being the wave travel time inversion methods (Geiger 1912; Aki and Lee 1976). These methods revolve around the goal of solving the nonlinear relationship between travel time and hypocenter location, requiring predefined constant velocity models of the medium (Richards et al. 2006). In the specific case I am interested in, which involves locating AE in rocks, the task becomes highly challenging when the rock exhibits anisotropy. This necessitates tomographic inversion of the sample to establish a velocity model, followed by an iterative inversion for location, which is computationally expensive.
 
-# **1. Adquisición de los datos**
+In this practical work, I will employ Machine Learning methods to locate the x, y coordinates using only the arrival times of the P-wave, completely bypassing the complexity of establishing velocity models and the iterative inversion process
 
-Como por la pandemia aun no he podido realizar ensayos experimentales con mis muestras. Decidi buscar datos de ensayos de rotura de emision acústica en articulos donde liberaran los datos. Este es el caso de [blue_text](https://en.x-mol.com/paper/article/1225011219574341632). El montaje experimental consiste en un marco de carga, un sistema de registro EA  y el montaje de la muestra de roca (Fig. 1a). El montaje experimental se hizo con una muestra de roca tipo granito con dimensiones 218 mm x 218 mm x 200 mm  con un plano vertical de 45 grados en el centro (simulando una falla de laboratorio). Luego se aplica tension a la roca para obtener un deslizamiento por cizallamiento lateral derecho
-en la falla de laboratorio a una tensión normal de falla de 10 MPa. Once sensores  piezoeléctricos  tipo Glaser fijados a la
-a la muestra de roca en los lados norte (N) y oeste (W). Estos sensores se conectan directamente al digitalizador, que está conectado al computador  que registra las señales de EA.
+# **1. Data Adquistion**
+
+Due to the ongoing pandemic, I have not been able to conduct experimental tests on my samples. Therefore, I decided to search for Acoustic Emission rupture test data in articles where the data was made available. This is the case with este enlace. The experimental setup consists of a loading frame, an AE recording system, and the rock sample assembly (Fig. 1a). The experimental setup utilized a granite rock sample with dimensions of 218 mm x 218 mm x 200 mm, featuring a vertical plane inclined at 45 degrees at the center (simulating a laboratory fault). Tension is then applied to the rock to induce lateral right shear failure in the laboratory fault at a normal failure stress of 10 MPa. Eleven piezoelectric sensors of Glaser type are attached to the rock sample on the north (N) and west (W) sides. These sensors are directly connected to the digitizer, which is linked to the computer recording the AE signals.
 
 <img width="707" alt="montaje" src="https://github.com/AlejandraRocks/-Machine-Learning-para-localizar-Emisi-n-Ac-stica-EA-en-Rocas-/assets/69768600/495ff562-0cd7-4c70-991c-2deb2b49f521">
 
-Se ralizaron 56 pruebas simulando una fuente de  EA mediante la 
-ruptura de la mina de lápiz de 0,7 mm de diámetro en lugares conocidos
-en la superficie de la falla (Hsu et al. 1978), antes de realizarse el ensayo de ruptura sobre la falla. Estos eventos se reparten por
-toda la  superficie de la falla para asegurar una buena cobertura espacial. El tiempo de las ondas P se estimo con el criterio Akaike Information Criterion (AIC). A continuacion se muestra un ejemplo de como se recibio la señal en cada sensor y el picking de la onda P.
+56 tests were conducted simulating an AE source by breaking a 0.7 mm diameter pencil lead at known locations on the fault surface (Hsu et al. 1978), prior to the actual fault rupture test. These events were distributed across the entire fault surface to ensure good spatial coverage. The arrival time of the P-waves was estimated using the Akaike Information Criterion (AIC) criterion. Below is an example of how the signal was received at each sensor and the picking of the P-wave.
+
+
+<img width="595" alt="figurejemplo" src="https://github.com/AlejandraRocks/-Machine-Learning-para-localizar-Emisi-n-Ac-stica-EA-en-Rocas-/assets/69768600/4ee4460a-473d-495e-a22c-0510cdd3baeb">
+
+The 56 pencil lead breakage tests were conducted on the fault surface. Since the Y-axis remains constant, a new coordinate system was established with X and Z axes.
 
 <img width="633" alt="descargar" src="https://github.com/AlejandraRocks/-Machine-Learning-para-localizar-Emisi-n-Ac-stica-EA-en-Rocas-/assets/69768600/3cdfecb7-b22a-498c-98b7-9854ba3baa46">
+
+
+
 
 
 
